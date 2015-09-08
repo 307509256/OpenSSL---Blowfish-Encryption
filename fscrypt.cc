@@ -4,23 +4,23 @@
 #include <cmath>
 #include "fscrypt.h"
 
-#define P_SIZE						18
-#define S_SIZE						1024
-#define S_X_MAX 					4
-#define S_Y_MAX						256
+#define P_SIZE            18
+#define S_SIZE            1024
+#define S_X_MAX           4
+#define S_Y_MAX           256
 
-#define S_INDEX(x, y) 		x + y * S_X_MAX
+#define S_INDEX(x, y)     x + y * S_X_MAX
 
-#define SWAP(x, y)				BF_LONG temp = x; x = y; y = temp;
+#define SWAP(x, y)        BF_LONG temp = x; x = y; y = temp;
 
 
 BF_LONG P_ARRAY[P_SIZE] = {
-	0x243f6a88L, 0x85a308d3L, 0x13198a2eL, 
-	0x03707344L, 0xa4093822L, 0x299f31d0L,
-	0x082efa98L, 0xec4e6c89L, 0x452821e6L, 
-	0x38d01377L, 0xbe5466cfL, 0x34e90c6cL,
-	0xc0ac29b7L, 0xc97c50ddL, 0x3f84d5b5L, 
-	0xb5470917L, 0x9216d5d9L, 0x8979fb1bL
+    0x243f6a88L, 0x85a308d3L, 0x13198a2eL, 
+    0x03707344L, 0xa4093822L, 0x299f31d0L,
+    0x082efa98L, 0xec4e6c89L, 0x452821e6L, 
+    0x38d01377L, 0xbe5466cfL, 0x34e90c6cL,
+    0xc0ac29b7L, 0xc97c50ddL, 0x3f84d5b5L, 
+    0xb5470917L, 0x9216d5d9L, 0x8979fb1bL
 };
 
 BF_LONG S_BOX[S_X_MAX][S_Y_MAX] = {
@@ -298,13 +298,13 @@ volatile int size = 0;
  * <BF_LONG> X                |
  **********************************************************/
 unsigned int F(const BF_KEY *key, BF_LONG X){
-	uint8_t a, b, c, d;
-	a = (X >> 24) & 0xFF;
-	b = (X >> 16) & 0xFF;
-	c = (X >> 8)  & 0xFF;
-	d = (X)       & 0xFF;
+    uint8_t a, b, c, d;
+    a = (X >> 24) & 0xFF;
+    b = (X >> 16) & 0xFF;
+    c = (X >> 8)  & 0xFF;
+    d = (X)       & 0xFF;
   
-	return ( ( key->S[ S_INDEX(0, a) ]   +
+    return ( ( key->S[ S_INDEX(0, a) ]   +
              key->S[ S_INDEX(1, b) ] ) ^
              key->S[ S_INDEX(2, c) ] ) +
              key->S[ S_INDEX(3, d) ];
@@ -325,32 +325,32 @@ unsigned int F(const BF_KEY *key, BF_LONG X){
  ***********************************************************************/
 void BF_encrypt(const BF_KEY *key, BF_LONG *string, BF_LONG xL, BF_LONG xR, int enc){
 
-	if(enc == BF_ENCRYPT){
-		for(int i = 0; i < 16; ++i){
-			xL ^= key->P[i];
-			xR = F(key, xL) ^ xR;
-			SWAP(xL, xR);			
-		}
-		SWAP(xL, xR);
-		xR ^= key->P[16];
-		xL ^= key->P[17];
+    if(enc == BF_ENCRYPT){
+        for(int i = 0; i < 16; ++i){
+            xL ^= key->P[i];
+            xR = F(key, xL) ^ xR;
+            SWAP(xL, xR);           
+        }
+        SWAP(xL, xR);
+        xR ^= key->P[16];
+        xL ^= key->P[17];
 
-		string[0] = xL;
-		string[1] = xR;
+        string[0] = xL;
+        string[1] = xR;
 
-	}else if(enc == BF_DECRYPT){
-		for(int i = 17; i > 1; --i){
-			xL ^= key->P[i];
-			xR = F(key, xL) ^ xR;
-			SWAP(xL, xR);			
-		}
-		SWAP(xL, xR);
-		xR ^= key->P[1];
-		xL ^= key->P[0];
+    }else if(enc == BF_DECRYPT){
+        for(int i = 17; i > 1; --i){
+            xL ^= key->P[i];
+            xR = F(key, xL) ^ xR;
+            SWAP(xL, xR);           
+        }
+        SWAP(xL, xR);
+        xR ^= key->P[1];
+        xL ^= key->P[0];
 
-		string[0] = xL;
-		string[1] = xR;
-	}
+        string[0] = xL;
+        string[1] = xR;
+    }
 }
 
 /*************************************************************************
@@ -367,11 +367,11 @@ void BF_encrypt(const BF_KEY *key, BF_LONG *string, BF_LONG xL, BF_LONG xR, int 
  **************************************************************************/
 void BF_set_subkey(BF_KEY *key, int len, const unsigned char *data){
 
-	BF_LONG *string = new BF_LONG[2];
+    BF_LONG *string = new BF_LONG[2];
   
   uint32_t dataBlk;
   int keylen = 0;
-	for(int i = 0; i < P_SIZE; ++i){
+    for(int i = 0; i < P_SIZE; ++i){
     dataBlk = 0x00000000;          // XOR each 32 bits of key with P[i]
     for(int j = 0; j < 4; ++j){
       dataBlk = (dataBlk << 8) | data[keylen];
@@ -380,7 +380,7 @@ void BF_set_subkey(BF_KEY *key, int len, const unsigned char *data){
         keylen = 0;
     }
     key->P[i] = P_ARRAY[i] ^ dataBlk;
-	}
+    }
 
   for(int i = 0; i < S_X_MAX; ++i){
     for(int j = 0; j < S_Y_MAX; ++j){
@@ -388,21 +388,21 @@ void BF_set_subkey(BF_KEY *key, int len, const unsigned char *data){
     }
   }
   
-	string[0] = string[1] = 0;
+    string[0] = string[1] = 0;
 
-	for(int i = 0; i < P_SIZE; i += 2){
-		BF_encrypt(key, string, string[0], string[1], 1);
-		key->P[i] = string[0];
-		key->P[i + 1] = string[1];
-	}
+    for(int i = 0; i < P_SIZE; i += 2){
+        BF_encrypt(key, string, string[0], string[1], 1);
+        key->P[i] = string[0];
+        key->P[i + 1] = string[1];
+    }
 
-	for(int x = 0; x < S_X_MAX; ++x){
-		for(int y = 0; y < S_Y_MAX; y += 2){
-			BF_encrypt(key, string, string[0], string[1], 1);
-			key->S[ S_INDEX(x, y)] = string[0];
-			key->S[ S_INDEX(x, y) + 1] = string[1];
-		}
-	}
+    for(int x = 0; x < S_X_MAX; ++x){
+        for(int y = 0; y < S_Y_MAX; y += 2){
+            BF_encrypt(key, string, string[0], string[1], 1);
+            key->S[ S_INDEX(x, y)] = string[0];
+            key->S[ S_INDEX(x, y) + 1] = string[1];
+        }
+    }
   
   delete string;
 }
@@ -430,100 +430,100 @@ void BF_ecb_encrypt(const unsigned char *in, unsigned char **outbuf,
          BF_KEY *key, int enc){                                                                  
 
   unsigned char *out = (unsigned char *)malloc(2 * sizeof(BF_LONG));
-	if(enc == BF_ENCRYPT){
+    if(enc == BF_ENCRYPT){
 
-		BF_LONG xL, xR, blk_rslt[2];
-		unsigned char *rxL, *rxR;
-		int in_len = size;
-		int num_blocks = ceil(double(in_len)/BLOCKSIZE);
-		int pad = in_len % BLOCKSIZE;
-	
-		size = 0;
-	
-		//create blocks
-		int in_idx = 0;
-		unsigned char block[num_blocks][BLOCKSIZE];
-		for(int blk = 0; blk < num_blocks; ++blk){
-			for(int i = 0; i < BLOCKSIZE; ++i){
-				if(in_idx < in_len){
-					block[blk][i] = in[in_idx++];
-				}else{
-					block[blk][i] = pad;
-				}
-			}
-		}
+        BF_LONG xL, xR, blk_rslt[2];
+        unsigned char *rxL, *rxR;
+        int in_len = size;
+        int num_blocks = ceil(double(in_len)/BLOCKSIZE);
+        int pad = in_len % BLOCKSIZE;
     
-		for(int blk = 0; blk < num_blocks; ++blk){
-			xL = *(BF_LONG*) block[blk];
-			xR = *(BF_LONG*)(block[blk] + sizeof(uint32_t));
+        size = 0;
+    
+        //create blocks
+        int in_idx = 0;
+        unsigned char block[num_blocks][BLOCKSIZE];
+        for(int blk = 0; blk < num_blocks; ++blk){
+            for(int i = 0; i < BLOCKSIZE; ++i){
+                if(in_idx < in_len){
+                    block[blk][i] = in[in_idx++];
+                }else{
+                    block[blk][i] = pad;
+                }
+            }
+        }
+    
+        for(int blk = 0; blk < num_blocks; ++blk){
+            xL = *(BF_LONG*) block[blk];
+            xR = *(BF_LONG*)(block[blk] + sizeof(uint32_t));
       
-			BF_encrypt(key, blk_rslt, xL, xR, BF_ENCRYPT);
+            BF_encrypt(key, blk_rslt, xL, xR, BF_ENCRYPT);
 
-			rxL = (unsigned char *)&blk_rslt[0];
-			rxR = (unsigned char *)&blk_rslt[1];
+            rxL = (unsigned char *)&blk_rslt[0];
+            rxR = (unsigned char *)&blk_rslt[1];
       
-			size_t sizeL = sizeof(rxL);
-			size_t sizeR = sizeof(rxR);
+            size_t sizeL = sizeof(rxL);
+            size_t sizeR = sizeof(rxR);
       
       unsigned char *temp = (unsigned char *)realloc(out, size + sizeL + sizeR);
       out = temp;
 
-			for(int idx = 0;  idx < sizeL / 2; ++idx){
+            for(int idx = 0;  idx < sizeL / 2; ++idx){
         out[size] = rxL[idx];
         ++size;
-			}
-			for(int idx = 0;  idx < sizeR / 2; ++idx){
+            }
+            for(int idx = 0;  idx < sizeR / 2; ++idx){
         out[size] = rxR[idx];
         ++size;
-			}
-		}
+            }
+        }
 
-	}else if(enc == BF_DECRYPT ){
+    }else if(enc == BF_DECRYPT ){
 
-		BF_LONG xL, xR, blk_rslt[2];
-		unsigned char *rxL, *rxR;
-		int in_len = size;						
-		int num_blocks = ceil(double(in_len)/BLOCKSIZE);
-		int pad = in_len%BLOCKSIZE;
-	
-		size = 0;
+        BF_LONG xL, xR, blk_rslt[2];
+        unsigned char *rxL, *rxR;
+        int in_len = size;                      
+        int num_blocks = ceil(double(in_len)/BLOCKSIZE);
+        int pad = in_len%BLOCKSIZE;
     
-		//create blocks
-		int in_idx = 0;
-		unsigned char block[num_blocks][BLOCKSIZE];
-		for(int blk = 0; blk < num_blocks; ++blk){
+        size = 0;
+    
+        //create blocks
+        int in_idx = 0;
+        unsigned char block[num_blocks][BLOCKSIZE];
+        for(int blk = 0; blk < num_blocks; ++blk){
       for(int i = 0; i < BLOCKSIZE; ++i){
-				if(in_idx < in_len){
-					block[blk][i] = in[in_idx++];
-				}else{
-					block[blk][i] = pad;
+                if(in_idx < in_len){
+                    block[blk][i] = in[in_idx++];
+                }else{
+                    block[blk][i] = pad;
         }
       }
-		}
+        }
 
-		for(int blk = 0; blk < num_blocks; ++blk){
-			
-			xL = *(BF_LONG*)block[blk];
-			xR = *(BF_LONG*)(block[blk] + sizeof(uint32_t));
-			BF_encrypt(key, blk_rslt, xL, xR, BF_DECRYPT);
-			rxL = (unsigned char *)&blk_rslt[0];
-			rxR = (unsigned char *)&blk_rslt[1];
+        for(int blk = 0; blk < num_blocks; ++blk){
+            
+            xL = *(BF_LONG*)block[blk];
+            xR = *(BF_LONG*)(block[blk] + sizeof(uint32_t));
+            BF_encrypt(key, blk_rslt, xL, xR, BF_DECRYPT);
+            rxL = (unsigned char *)&blk_rslt[0];
+            rxR = (unsigned char *)&blk_rslt[1];
 
-			size_t sizeL = sizeof(rxL);
-			size_t sizeR = sizeof(rxR);
+            size_t sizeL = sizeof(rxL);
+            size_t sizeR = sizeof(rxR);
       
       unsigned char *temp = (unsigned char *)realloc(out, size + sizeL + sizeR);
       out = temp;
       
-			for(int idx = 0;  idx < sizeL / 2; ++idx){
-					out[size] = rxL[idx];
-					++size;
-			}
-			for(int idx = 0;  idx < sizeR / 2; ++idx){
-					out[size] = rxR[idx];
-					++size;
-			}
-		}
+            for(int idx = 0;  idx < sizeL / 2; ++idx){
+                    out[size] = rxL[idx];
+                    ++size;
+            }
+            for(int idx = 0;  idx < sizeR / 2; ++idx){
+                    out[size] = rxR[idx];
+                    ++size;
+            }
+        }
     for(int bufLen = 0; bufLen < size; ++bufLen){
       if(out[bufLen] == '\0'){
         size = bufLen + 1;
@@ -531,7 +531,7 @@ void BF_ecb_encrypt(const unsigned char *in, unsigned char **outbuf,
         break;
       }
     }
-	}
+    }
 
   *outbuf = (unsigned char *)realloc(out, size);
 }
@@ -549,20 +549,20 @@ void BF_ecb_encrypt(const unsigned char *in, unsigned char **outbuf,
  * <int  *> resultlen         |
  ****************************************************************************/
 void *fs_encrypt(void *plaintext, int bufsize, char *keystr, 
-		int *resultlen){
+        int *resultlen){
 
-	BF_KEY *key = new BF_KEY;
-	const unsigned char *text = (const unsigned char*)plaintext;
-	unsigned char *outbuf;
-	size_t key_len = strlen(keystr);
+    BF_KEY *key = new BF_KEY;
+    const unsigned char *text = (const unsigned char*)plaintext;
+    unsigned char *outbuf;
+    size_t key_len = strlen(keystr);
 
-	size = bufsize;
-	BF_set_subkey(key, (int)key_len, (const unsigned char *)keystr);
-	BF_ecb_encrypt(text, &outbuf, key, BF_ENCRYPT);
-	*resultlen = size;
+    size = bufsize;
+    BF_set_subkey(key, (int)key_len, (const unsigned char *)keystr);
+    BF_ecb_encrypt(text, &outbuf, key, BF_ENCRYPT);
+    *resultlen = size;
   
-	delete key;
-	return outbuf;
+    delete key;
+    return outbuf;
 }
 
 /***************************************************************************
@@ -578,20 +578,20 @@ void *fs_encrypt(void *plaintext, int bufsize, char *keystr,
  * <int  *> resultlen         |
  ***************************************************************************/
 void *fs_decrypt(void *ciphertext, int bufsize, char *keystr, 
-		int *resultlen){
+        int *resultlen){
 
-	BF_KEY *key = new BF_KEY;
-	const unsigned char *text = (const unsigned char*)ciphertext;
-	unsigned char *outbuf;
-	size_t key_len = strlen(keystr);
+    BF_KEY *key = new BF_KEY;
+    const unsigned char *text = (const unsigned char*)ciphertext;
+    unsigned char *outbuf;
+    size_t key_len = strlen(keystr);
   
-	size = bufsize;
-	BF_set_subkey(key, (int)key_len, (const unsigned char *)keystr);
-	BF_ecb_encrypt(text, &outbuf, key, BF_DECRYPT);
-	*resultlen = size;
+    size = bufsize;
+    BF_set_subkey(key, (int)key_len, (const unsigned char *)keystr);
+    BF_ecb_encrypt(text, &outbuf, key, BF_DECRYPT);
+    *resultlen = size;
   
-	delete key;
-	return outbuf;
+    delete key;
+    return outbuf;
 }
 
 
