@@ -2,4 +2,8 @@ Ernie Lee elee36@binghamton.edu
 Code tested on remote.cs.binghamton.edu
 
 
-Incompleted
+Completed. 
+
+Look at main.cc to see how encryption and decryption functions work. 
+
+// TODO: Need to organise the program better. Currently a mess.
