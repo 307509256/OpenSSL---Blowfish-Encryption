@@ -367,7 +367,7 @@ void BF_encrypt(const BF_KEY *key, BF_LONG *string, BF_LONG xL, BF_LONG xR, int 
  **************************************************************************/
 void BF_set_subkey(BF_KEY *key, int len, const unsigned char *data){
 
-    BF_LONG *string = new BF_LONG[2];
+  BF_LONG *string = new BF_LONG[2];
   
   uint32_t dataBlk;
   int keylen = 0;
@@ -430,100 +430,100 @@ void BF_ecb_encrypt(const unsigned char *in, unsigned char **outbuf,
          BF_KEY *key, int enc){                                                                  
 
   unsigned char *out = (unsigned char *)malloc(2 * sizeof(BF_LONG));
-    if(enc == BF_ENCRYPT){
+  if(enc == BF_ENCRYPT){
 
-        BF_LONG xL, xR, blk_rslt[2];
-        unsigned char *rxL, *rxR;
-        int in_len = size;
-        int num_blocks = ceil(double(in_len)/BLOCKSIZE);
-        int pad = in_len % BLOCKSIZE;
-    
-        size = 0;
-    
-        //create blocks
-        int in_idx = 0;
-        unsigned char block[num_blocks][BLOCKSIZE];
-        for(int blk = 0; blk < num_blocks; ++blk){
-            for(int i = 0; i < BLOCKSIZE; ++i){
-                if(in_idx < in_len){
-                    block[blk][i] = in[in_idx++];
-                }else{
-                    block[blk][i] = pad;
-                }
+    BF_LONG xL, xR, blk_rslt[2];
+    unsigned char *rxL, *rxR;
+    int in_len = size;
+    int num_blocks = ceil(double(in_len)/BLOCKSIZE);
+    int pad = in_len % BLOCKSIZE;
+
+    size = 0;
+
+    //create blocks
+    int in_idx = 0;
+    unsigned char block[num_blocks][BLOCKSIZE];
+    for(int blk = 0; blk < num_blocks; ++blk){
+        for(int i = 0; i < BLOCKSIZE; ++i){
+            if(in_idx < in_len){
+                block[blk][i] = in[in_idx++];
+            }else{
+                block[blk][i] = pad;
             }
         }
-    
-        for(int blk = 0; blk < num_blocks; ++blk){
-            xL = *(BF_LONG*) block[blk];
-            xR = *(BF_LONG*)(block[blk] + sizeof(uint32_t));
-      
-            BF_encrypt(key, blk_rslt, xL, xR, BF_ENCRYPT);
+    }
 
-            rxL = (unsigned char *)&blk_rslt[0];
-            rxR = (unsigned char *)&blk_rslt[1];
-      
-            size_t sizeL = sizeof(rxL);
-            size_t sizeR = sizeof(rxR);
-      
-      unsigned char *temp = (unsigned char *)realloc(out, size + sizeL + sizeR);
-      out = temp;
+    for(int blk = 0; blk < num_blocks; ++blk){
+        xL = *(BF_LONG*) block[blk];
+        xR = *(BF_LONG*)(block[blk] + sizeof(uint32_t));
+  
+        BF_encrypt(key, blk_rslt, xL, xR, BF_ENCRYPT);
 
-            for(int idx = 0;  idx < sizeL / 2; ++idx){
-        out[size] = rxL[idx];
-        ++size;
-            }
-            for(int idx = 0;  idx < sizeR / 2; ++idx){
-        out[size] = rxR[idx];
-        ++size;
-            }
+        rxL = (unsigned char *)&blk_rslt[0];
+        rxR = (unsigned char *)&blk_rslt[1];
+  
+        size_t sizeL = sizeof(rxL);
+        size_t sizeR = sizeof(rxR);
+  
+        unsigned char *temp = (unsigned char *)realloc(out, size + sizeL + sizeR);
+        out = temp;
+
+        for(int idx = 0;  idx < sizeL / 2; ++idx){
+          out[size] = rxL[idx];
+          ++size;
         }
+        for(int idx = 0;  idx < sizeR / 2; ++idx){
+          out[size] = rxR[idx];
+          ++size;
+        }
+    }
 
-    }else if(enc == BF_DECRYPT ){
+  }else if(enc == BF_DECRYPT ){
 
-        BF_LONG xL, xR, blk_rslt[2];
-        unsigned char *rxL, *rxR;
-        int in_len = size;                      
-        int num_blocks = ceil(double(in_len)/BLOCKSIZE);
-        int pad = in_len%BLOCKSIZE;
-    
-        size = 0;
-    
-        //create blocks
-        int in_idx = 0;
-        unsigned char block[num_blocks][BLOCKSIZE];
-        for(int blk = 0; blk < num_blocks; ++blk){
+    BF_LONG xL, xR, blk_rslt[2];
+    unsigned char *rxL, *rxR;
+    int in_len = size;                      
+    int num_blocks = ceil(double(in_len)/BLOCKSIZE);
+    int pad = in_len%BLOCKSIZE;
+
+    size = 0;
+
+    //create blocks
+    int in_idx = 0;
+    unsigned char block[num_blocks][BLOCKSIZE];
+    for(int blk = 0; blk < num_blocks; ++blk){
       for(int i = 0; i < BLOCKSIZE; ++i){
-                if(in_idx < in_len){
-                    block[blk][i] = in[in_idx++];
-                }else{
-                    block[blk][i] = pad;
+        if(in_idx < in_len){
+          block[blk][i] = in[in_idx++];
+        }else{
+          block[blk][i] = pad;
         }
       }
-        }
+    }
 
-        for(int blk = 0; blk < num_blocks; ++blk){
-            
-            xL = *(BF_LONG*)block[blk];
-            xR = *(BF_LONG*)(block[blk] + sizeof(uint32_t));
-            BF_encrypt(key, blk_rslt, xL, xR, BF_DECRYPT);
-            rxL = (unsigned char *)&blk_rslt[0];
-            rxR = (unsigned char *)&blk_rslt[1];
+    for(int blk = 0; blk < num_blocks; ++blk){
+        
+        xL = *(BF_LONG*)block[blk];
+        xR = *(BF_LONG*)(block[blk] + sizeof(uint32_t));
+        BF_encrypt(key, blk_rslt, xL, xR, BF_DECRYPT);
+        rxL = (unsigned char *)&blk_rslt[0];
+        rxR = (unsigned char *)&blk_rslt[1];
 
-            size_t sizeL = sizeof(rxL);
-            size_t sizeR = sizeof(rxR);
-      
-      unsigned char *temp = (unsigned char *)realloc(out, size + sizeL + sizeR);
-      out = temp;
-      
-            for(int idx = 0;  idx < sizeL / 2; ++idx){
-                    out[size] = rxL[idx];
-                    ++size;
-            }
-            for(int idx = 0;  idx < sizeR / 2; ++idx){
-                    out[size] = rxR[idx];
-                    ++size;
-            }
+        size_t sizeL = sizeof(rxL);
+        size_t sizeR = sizeof(rxR);
+  
+        unsigned char *temp = (unsigned char *)realloc(out, size + sizeL + sizeR);
+        out = temp;
+  
+        for(int idx = 0;  idx < sizeL / 2; ++idx){
+                out[size] = rxL[idx];
+                ++size;
         }
+        for(int idx = 0;  idx < sizeR / 2; ++idx){
+                out[size] = rxR[idx];
+                ++size;
+        }
+    }
     for(int bufLen = 0; bufLen < size; ++bufLen){
       if(out[bufLen] == '\0'){
         size = bufLen + 1;
@@ -531,7 +531,7 @@ void BF_ecb_encrypt(const unsigned char *in, unsigned char **outbuf,
         break;
       }
     }
-    }
+  }
 
   *outbuf = (unsigned char *)realloc(out, size);
 }
