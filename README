@@ -7,3 +7,4 @@ Completed.
 Look at main.cc to see how encryption and decryption functions work. 
 
 // TODO: Need to organise the program better. Currently a mess.
+// Implement CBC
